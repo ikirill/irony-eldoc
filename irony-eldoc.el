@@ -1,4 +1,4 @@
-;;; irony-eldoc --- irony-mode support for eldoc -*- lexical-binding: t -*-
+;;; irony-eldoc.el --- irony-mode support for eldoc-mode -*- lexical-binding: t -*-
 ;;
 ;; Copyright (C) 2014 Kirill Ignatiev <github.com/ikirill>
 ;;
@@ -41,6 +41,10 @@
 ;; ![Screenshot](screenshot.png "Screenshot")
 ;;
 ;; Notes:
+;;
+;; - It is based on irony-mode, which is in turn based on libclang. As a
+;;   result, it avoid reparsing files when possible and is quite
+;;   accurate.
 ;;
 ;; - TODO It is a little imprecise when it comes to function calls:
 ;;   right now it resolves overloaded function calls by the number of
@@ -446,20 +450,19 @@ Notes:
     (put 'irony-eldoc 'insert-behind-hooks (list hook)))
   (cond
    (irony-eldoc
-    (unless eldoc-mode (eldoc-mode))
     (setq-local eldoc-documentation-function
-                #'irony-eldoc-documentation-function))
+                #'irony-eldoc-documentation-function)
+    (unless eldoc-mode (eldoc-mode)))
    (t
     (when (eq eldoc-documentation-function
               #'irony-eldoc-documentation-function)
-      (setq eldoc-documentation-function nil)))))
+      (setq-local eldoc-documentation-function nil)))))
 
 ;; }}}
 
 (provide 'irony-eldoc)
-
-;;; Local Variables:
-;;; byte-compile-warnings: (not cl-functions)
-;;; coding: utf-8-unix
-;;; End:
-;;; irony-eldoc ends here
+;; Local Variables:
+;; byte-compile-warnings: (not cl-functions)
+;; coding: utf-8-unix
+;; End:
+;;; irony-eldoc.el ends here
