@@ -251,19 +251,21 @@ surrounding point."
   "Return docstring for a given symbol.
 
 The symbol is specified by PROP, which is an object taken from
-`irony-completion--candidates'."
+`irony-completion-candidates'."
   ;; Show documentation for a symbol.
   ;; variable of type T: "variable => T"
   ;; void function(...): "function(...)"
   ;; T function(...): "function(...) => T"
-  (let* ((name (propertize (nth 0 prop)
+  (let* ((name (propertize (irony-completion-typed-text prop)
                            'face 'eldoc-highlight-function-argument))
-         (result-type (nth 2 prop))
-         (post-completion-data (nth 6 prop))
+         (result-type (irony-completion-type prop))
+         (post-completion-data
+          (cons (irony-completion-post-comp-str prop)
+                (irony-completion-post-comp-placeholders prop)))
          (has-result-type (not (string= "" result-type)))
          (arglist (car post-completion-data))
          (has-arglist (not (string= "" arglist)))
-         (docstring (nth 3 prop))
+         (docstring (irony-completion-brief prop))
          (has-docstring (not (string= "" docstring))))
     (unless (string= "" docstring)
       (setq docstring (propertize docstring 'face 'variable-pitch))
@@ -287,14 +289,16 @@ ARG-INDEX and ARG-COUNT specify the index of function argument to
 be highlighted, and PROP is an object from
 `irony-completion--candidates'."
   ;; Show documentation inside a function call
-  (let* ((name (nth 0 prop))
+  (let* ((name (irony-completion-typed-text prop))
          ;; FIXME The result type is "void" for constructors
-         (result-type (nth 2 prop))
+         (result-type (irony-completion-type prop))
          (has-result-type (not (string= "" result-type)))
-         (post-completion-data (nth 6 prop))
+         (post-completion-data
+          (cons (irony-completion-post-comp-str prop)
+                (irony-completion-post-comp-placeholders prop)))
          (arglist (car post-completion-data))
          (has-arguments (not (string= "" arglist)))
-         (docstring (nth 3 prop))
+         (docstring (irony-completion-brief prop))
          (has-docstring (not (string= "" docstring))))
     (when has-docstring
       (setq docstring (propertize docstring 'face 'variable-pitch))
@@ -331,9 +335,13 @@ its documentation stored.
 Once this is done, CONTINUATION will be called."
   ;; (message "irony-eldoc--callback %s: %d candidates" thing (length irony-completion--candidates))
   (let ((current-thing (buffer-substring-no-properties (nth 1 thing) (nth 2 thing)))
-        (matches (cl-remove-if-not
-                  (lambda (x) (equal (car x) (car thing)))
-                  irony-completion--candidates)))
+        (matches
+         (cl-remove-if-not
+          (lambda (x) (equal (car x) (car thing)))
+          ;; FIXME This really should be (irony-completion-candidates)
+          ;; but that function looks at (point) to see if completion
+          ;; context is the same, so we use the internal irony-mode variable.
+          irony-completion--candidates)))
     (when (equal current-thing (car thing))
       (let ((o (make-overlay (nth 1 thing) (nth 2 thing))))
         (overlay-put o 'category 'irony-eldoc)
@@ -358,7 +366,7 @@ If ONLY-USE-CACHED is non-nil, only look at cached documentation."
      ((not thing) nil)
 
      ;; Here each element of props is an object that came from
-     ;; `irony-completion--candidates' that matches the symbol whose
+     ;; `irony-completion-candidates' that matches the symbol whose
      ;; information needs to be displayed.
      ((and props (not (car thing)))
       (let ((matching-docstrings
@@ -368,7 +376,7 @@ If ONLY-USE-CACHED is non-nil, only look at cached documentation."
           (mapconcat #'identity matching-docstrings ";; "))))
 
      ;; For a function call there will often be many different matches
-     ;; in `irony-completion--candidates', so here we select all of
+     ;; in `irony-completion-candidates', so here we select all of
      ;; them that have the same number of arguments.
      ;; FIXME This doesn't distinguish between template and function arguments.
      (props
