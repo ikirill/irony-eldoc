@@ -305,7 +305,7 @@ be highlighted, and PROP is an object from
       (setq docstring (concat "; " docstring)))
     (when (and has-arguments
                (>= (length post-completion-data)
-                  (1+ (* 2 arg-count))))
+                   (1+ (* 2 arg-count))))
       (let ((from (nth (+ 1 (* 2 arg-index)) post-completion-data))
             (to (nth (+ 2 (* 2 arg-index)) post-completion-data)))
         (setq arglist
@@ -370,7 +370,7 @@ If ONLY-USE-CACHED is non-nil, only look at cached documentation."
      ;; information needs to be displayed.
      ((and props (not (car thing)))
       (let ((matching-docstrings
-             (remove-if-not
+             (cl-remove-if-not
               #'identity (mapcar #'irony-eldoc--show-symbol props))))
         (when matching-docstrings
           (mapconcat #'identity matching-docstrings ";; "))))
@@ -384,7 +384,7 @@ If ONLY-USE-CACHED is non-nil, only look at cached documentation."
              (arg-count (cdar thing))
              (matching-props
               ;; Matching function calls with the right number of arguments
-              (remove-if-not
+              (cl-remove-if-not
                (lambda (it) (= (length (nth 6 it)) (1+ (* 2 arg-count))))
                props))
              (docstring (mapconcat
@@ -399,9 +399,9 @@ If ONLY-USE-CACHED is non-nil, only look at cached documentation."
      ((not only-use-cached)
       (save-excursion
         (goto-char (nth 3 thing))
-        (lexical-let ((callback-thing (cdr thing))
-                      (async-flag nil)
-                      (matches-available nil))
+        (let ((callback-thing (cdr thing))
+              (async-flag nil)
+              (matches-available nil))
           ;; Sometimes the callback is called immediately, and
           ;; sometimes it is called later. Both cases need to be
           ;; handled properly.
