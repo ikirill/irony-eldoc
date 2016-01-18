@@ -12,6 +12,9 @@ call.
 
 It is easiest to add `irony-eldoc` to `irony-mode-hook`, if you
 already have `irony-mode` set up.
+~~~el
+(add-hook 'irony-mode-hook 'irony-eldoc)
+~~~
 
 ## Screenshot
 
