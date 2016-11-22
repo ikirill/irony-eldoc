@@ -80,6 +80,13 @@ have these underscores, which carry no extra information."
   :group 'irony-eldoc
   :type 'boolean)
 
+(defcustom irony-eldoc-use-unicode
+  nil
+  "If non-nil, use Unicode characters ∷ and ⇒ instead of :: and
+=> in eldoc messages."
+  :group 'irony-eldoc
+  :type 'boolean)
+
 ;; }}}
 ;; {{{ Utilities
 
@@ -87,13 +94,16 @@ have these underscores, which carry no extra information."
   "Strip leading underscores from all identifiers in STRING.
 
 It also prettifies the string by replacing things like \"::\"
-with their Unicode equivalents.
+with their Unicode equivalents, if `irony-eldoc-use-unicode' is
+non-nil.
 
 Has no effect if `irony-eldoc-strip-underscores' is non-nil."
   (if (or (not string) (not irony-eldoc-strip-underscores))
       string
     (let ((new-string string)
-          (regexps '(("\\_<_+" . "") ("::" . "∷"))))
+          (regexps (if irony-eldoc-use-unicode
+                       '(("\\_<_+" . "") ("::" . "∷"))
+                     '(("\\_<_+" . "")))))
       (dolist (r regexps)
         (setq new-string
               (replace-regexp-in-string (car r) (cdr r) new-string)))
@@ -277,9 +287,9 @@ The symbol is specified by PROP, which is an object taken from
       ((and (not has-arglist) (not has-result-type) (not has-docstring))
        nil)
       ((and (not has-arglist) has-result-type)
-       (concat name " ⇒ " result-type docstring))
+       (concat name (if irony-eldoc-use-unicode " ⇒ " " => ") result-type docstring))
       (has-result-type
-       (concat name arglist " ⇒ " result-type docstring))
+       (concat name arglist (if irony-eldoc-use-unicode " ⇒ " " => ") result-type docstring))
       (t
        nil)))))
 
@@ -316,7 +326,7 @@ be highlighted, and PROP is an object from
                       (substring arglist to)))))
     (irony-eldoc--strip-underscores
      (if (or has-result-type has-docstring)
-         (concat name arglist " ⇒ " result-type docstring)
+         (concat name arglist (if irony-eldoc-use-unicode " ⇒ " " => ") result-type docstring)
        (concat name arglist)))))
 
 ;; }}}
