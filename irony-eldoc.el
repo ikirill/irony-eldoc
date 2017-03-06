@@ -399,7 +399,7 @@ If ONLY-USE-CACHED is non-nil, only look at cached documentation."
      ((not only-use-cached)
       (save-excursion
         (goto-char (nth 3 thing))
-        (lexical-let ((callback-thing (cdr thing))
+        (let ((callback-thing (cdr thing))
                       (async-flag nil)
                       (matches-available nil))
           ;; Sometimes the callback is called immediately, and
