@@ -466,7 +466,7 @@ Notes:
    (t
     (when (eq eldoc-documentation-function
               #'irony-eldoc-documentation-function)
-      (setq-local eldoc-documentation-function nil)))))
+      (setq-local eldoc-documentation-function #'ignore)))))
 
 ;; }}}
 
