@@ -208,6 +208,7 @@ inside `condition-case'."
                      close-paren (save-excursion (forward-list) (point)))
                ;; possibly skip across a template bracket
                (progn (when (= (char-before) ?>) (backward-list))
+                      (skip-syntax-backward " ")
                       (thing-at-point 'symbol)))
         (setq bounds (bounds-of-thing-at-point 'symbol)
               thing (buffer-substring-no-properties
