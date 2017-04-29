@@ -471,7 +471,6 @@ Notes:
 
 (provide 'irony-eldoc)
 ;; Local Variables:
-;; byte-compile-warnings: (not cl-functions)
 ;; coding: utf-8-unix
 ;; End:
 ;;; irony-eldoc.el ends here
