@@ -372,6 +372,11 @@ If ONLY-USE-CACHED is non-nil, only look at cached documentation."
          (thing (irony-eldoc--which-thing in-string))
          ;; Previous lookups of documentation are stored in char property
          ;; 'irony-eldoc (which belongs to an overlay on top of the symbol).
+         (has-props (and thing (nth 2 thing)
+                       (cl-remove-if-not
+                        (lambda (o) (eq (overlay-get o 'category) 'irony-eldoc))
+                        (overlays-at (nth 2 thing)))))
+         ;; props can be nil if there were no candidates
          (props (and thing (get-char-property (nth 2 thing) 'irony-eldoc))))
     ;; (dolist (p props) (message "%s" (prin1-to-string p)))
     (cond
@@ -408,12 +413,12 @@ If ONLY-USE-CACHED is non-nil, only look at cached documentation."
 
      ;; If there is no cached doc, a request is made, which may or may
      ;; not return immediately.
-     ((not only-use-cached)
+     ((not (or has-props only-use-cached))
       (save-excursion
         (goto-char (nth 3 thing))
         (let ((callback-thing (cdr thing))
-                      (async-flag nil)
-                      (matches-available nil))
+              (async-flag nil)
+              (matches-available nil))
           ;; Sometimes the callback is called immediately, and
           ;; sometimes it is called later. Both cases need to be
           ;; handled properly.
