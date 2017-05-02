@@ -285,13 +285,12 @@ The symbol is specified by PROP, which is an object taken from
       (setq docstring (concat "; " docstring)))
     (irony-eldoc--strip-underscores
      (cond
-      ;; Things like builtin types have nothing of interest.
-      ((and (not has-arglist) (not has-result-type) (not has-docstring))
-       nil)
-      ((and (not has-arglist) has-result-type)
-       (concat name (if irony-eldoc-use-unicode " ⇒ " " => ") result-type docstring))
       (has-result-type
        (concat name arglist (if irony-eldoc-use-unicode " ⇒ " " => ") result-type docstring))
+      ;; (not has-result-type) seems to happen to some macros,
+      ;; in which case argument names can still be meaningful
+      ((or has-arglist has-docstring)
+       (concat name arglist docstring))
       (t
        nil)))))
 
