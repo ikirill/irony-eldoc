@@ -110,7 +110,8 @@ Has no effect if `irony-eldoc-strip-underscores' is non-nil."
       new-string)))
 
 (defvar irony-eldoc--ignore-symbol-regex
-  (rx (or
+  (rx string-start
+      (or
        (and (1+ digit) (opt "e" (opt (1+ digit))))
        (or ;; Taken from `cc-langs'
         "bool" "char" "wchar_t" "short" "int" "long" "signed" "unsigned"
@@ -137,7 +138,8 @@ Has no effect if `irony-eldoc-strip-underscores' is non-nil."
         "goto" "break" "continue"
         "NULL" "nullptr" "false" "true"
         "nil" "Nil" "YES" "NO" "NS_DURING" "NS_HANDLER" "NS_ENDHANDLER"
-        "operator" "this" "super" "self")))
+        "operator" "this" "super" "self"))
+      string-end)
   "Regex for identifiers that irony-eldoc should ignore entirely.
 
 This is primitive types, common types, common values (NULL, true,
