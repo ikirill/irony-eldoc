@@ -270,7 +270,10 @@ The symbol is specified by PROP, which is an object taken from
   ;; void function(...): "function(...)"
   ;; T function(...): "function(...) => T"
   (let* ((name (propertize (irony-completion-typed-text prop)
-                           'face 'eldoc-highlight-function-argument))
+                           'face
+                           (if (string= "" (irony-completion-annotation prop))
+                               'font-lock-variable-name-face
+                             'font-lock-function-name-face)))
          (result-type (irony-completion-type prop))
          (post-completion-data
           (cons (irony-completion-post-comp-str prop)
@@ -301,7 +304,8 @@ ARG-INDEX and ARG-COUNT specify the index of function argument to
 be highlighted, and PROP is an object from
 `irony-completion--candidates'."
   ;; Show documentation inside a function call
-  (let* ((name (irony-completion-typed-text prop))
+  (let* ((name (propertize (irony-completion-typed-text prop)
+                           'face 'font-lock-function-name-face))
          ;; FIXME The result type is "void" for constructors
          (result-type (irony-completion-type prop))
          (has-result-type (not (string= "" result-type)))
